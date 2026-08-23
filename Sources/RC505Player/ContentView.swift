@@ -1,11 +1,19 @@
 import SwiftUI
 import AppKit
 
+private enum SidebarTab: String, CaseIterable, Hashable {
+    case all = "All Songs"
+    case favorites = "Favorites"
+}
+
 struct ContentView: View {
     @State private var songs: [Song] = []
     @State private var selectedSongID: Song.ID?
+    @State private var sidebarTab: SidebarTab = .all
+    @State private var exportAllError: String?
     @StateObject private var playback = PlaybackController()
     @StateObject private var namesStore = NamesStore()
+    @StateObject private var organizer = SongOrganizerStore()
 
     private static let lastFolderKey = "lastLibraryPath"
 
@@ -27,23 +35,107 @@ struct ContentView: View {
                         .padding()
                     Spacer()
                 } else {
-                    List(songs, selection: $selectedSongID) { song in
-                        SongRow(song: song, isPlaying: playback.playingSongID == song.id, namesStore: namesStore)
-                            .tag(song.id)
+                    Picker("", selection: $sidebarTab) {
+                        ForEach(SidebarTab.allCases, id: \.self) { tab in
+                            Text(tab.rawValue).tag(tab)
+                        }
                     }
-                    .listStyle(.sidebar)
+                    .pickerStyle(.segmented)
+                    .labelsHidden()
+                    .padding(.horizontal)
+                    .padding(.bottom, 8)
+
+                    let displayedSongs = sidebarTab == .all ? organizer.sorted(songs) : organizer.favoritesOnly(songs)
+
+                    if displayedSongs.isEmpty {
+                        Spacer()
+                        Text("No favorites yet. Hover a song and click its star to add it here.")
+                            .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.center)
+                            .padding()
+                        Spacer()
+                    } else {
+                        List(selection: $selectedSongID) {
+                            ForEach(displayedSongs) { song in
+                                SongRow(song: song, isPlaying: playback.playingSongID == song.id, namesStore: namesStore, organizer: organizer)
+                                    .tag(song.id)
+                            }
+                            .onMove { indices, newOffset in
+                                organizer.move(allSongs: songs, displayed: displayedSongs, from: indices, to: newOffset)
+                            }
+                        }
+                        .listStyle(.sidebar)
+
+                        if sidebarTab == .favorites {
+                            Button {
+                                exportAllFavorites(displayedSongs)
+                            } label: {
+                                Label("Export All", systemImage: "square.and.arrow.up")
+                            }
+                            .buttonStyle(.bordered)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .help("Copy every favorite song's tracks into its own folder")
+                        }
+                    }
                 }
             }
             .frame(minWidth: 220)
         } detail: {
             if let song = songs.first(where: { $0.id == selectedSongID }) {
-                SongDetailView(song: song, playback: playback, namesStore: namesStore)
+                SongDetailView(song: song, playback: playback, namesStore: namesStore, organizer: organizer)
             } else {
                 Text("Select a song")
                     .foregroundStyle(.secondary)
             }
         }
         .onAppear(perform: restoreLastFolder)
+        .alert("Export Failed", isPresented: Binding(
+            get: { exportAllError != nil },
+            set: { if !$0 { exportAllError = nil } }
+        )) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(exportAllError ?? "")
+        }
+    }
+
+    private func exportAllFavorites(_ favorites: [Song]) {
+        let panel = NSOpenPanel()
+        panel.canChooseDirectories = true
+        panel.canChooseFiles = false
+        panel.canCreateDirectories = true
+        panel.prompt = "Export Here"
+        panel.message = "Choose a location to export your \(favorites.count) favorite song\(favorites.count == 1 ? "" : "s") into"
+
+        guard panel.runModal() == .OK, let destination = panel.url else { return }
+
+        let favoritesFolder: URL
+        do {
+            favoritesFolder = try LibraryExporter.makeGroupFolder(named: "Favorites", in: destination)
+        } catch {
+            exportAllError = error.localizedDescription
+            return
+        }
+
+        var exportedAny = false
+        var failures: [String] = []
+
+        for song in favorites {
+            do {
+                _ = try LibraryExporter.export(song: song, namesStore: namesStore, to: favoritesFolder)
+                exportedAny = true
+            } catch {
+                failures.append("\(song.displayName(using: namesStore)): \(error.localizedDescription)")
+            }
+        }
+
+        if exportedAny {
+            NSWorkspace.shared.activateFileViewerSelecting([favoritesFolder])
+        }
+        if !failures.isEmpty {
+            exportAllError = failures.joined(separator: "\n")
+        }
     }
 
     private func chooseFolder() {
