@@ -33,4 +33,13 @@ final class NamesStore: ObservableObject {
         guard let data = try? JSONEncoder().encode(customNames) else { return }
         UserDefaults.standard.set(data, forKey: Self.defaultsKey)
     }
+
+    /// Clears every custom name. Used when switching to a different export
+    /// folder, since song/track keys are just numbers (e.g. "001", "001_1")
+    /// and a new batch's numbering can otherwise collide with an old
+    /// batch's, making old names appear to "carry over" onto new songs.
+    func clearAll() {
+        customNames.removeAll()
+        UserDefaults.standard.removeObject(forKey: Self.defaultsKey)
+    }
 }
