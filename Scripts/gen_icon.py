@@ -71,27 +71,38 @@ def make_master():
     cx, cy = CANVAS / 2, CANVAS / 2
     R = CANVAS * 0.335
     stroke = CANVAS * 0.075
+    ring_color = (255, 255, 255, 235)
+
+    def point(angle_deg, radius):
+        theta = math.radians(angle_deg)
+        return (cx + radius * math.cos(theta), cy + radius * math.sin(theta))
 
     # Loop ring with a gap at the top (a "Loop Station" motif). Angle
     # convention here: 0=right/east, 90=bottom, 270=top.
     gap_half = 25  # degrees
     start_deg = 270 + gap_half
     end_deg = 270 - gap_half + 360
-    bbox = [cx - R, cy - R, cx + R, cy + R]
-    draw.arc(bbox, start_deg, end_deg, fill=(255, 255, 255, 235), width=int(stroke))
+
+    # Build the ring as a precise annular-sector polygon (rather than
+    # ImageDraw.arc's stroked-line approximation, which is imprecise at the
+    # endpoints for a stroke this thick) so the tail dot and arrowhead below
+    # — which use the same point()/angle math — land exactly flush with it.
+    inner_R, outer_R = R - stroke / 2, R + stroke / 2
+    ring_steps = 400
+    angles = [start_deg + (end_deg - start_deg) * i / ring_steps for i in range(ring_steps + 1)]
+    ring_poly = [point(a, outer_R) for a in angles] + [point(a, inner_R) for a in reversed(angles)]
+    draw.polygon(ring_poly, fill=ring_color)
 
     # Round cap on the tail end only (the arrow forms the other end's cap).
-    theta_tail = math.radians(start_deg)
-    tail_x, tail_y = cx + R * math.cos(theta_tail), cy + R * math.sin(theta_tail)
+    tail_x, tail_y = point(start_deg, R)
     r = stroke / 2
-    draw.ellipse([tail_x - r, tail_y - r, tail_x + r, tail_y + r], fill=(255, 255, 255, 235))
+    draw.ellipse([tail_x - r, tail_y - r, tail_x + r, tail_y + r], fill=ring_color)
 
     # Arrowhead at the end of the arc, tangent to the circle, pointing
     # clockwise (continuing the loop). Flat base straddles the ring line,
     # tip points forward along the tangent direction.
     theta_end = math.radians(end_deg)
-    ex = cx + R * math.cos(theta_end)
-    ey = cy + R * math.sin(theta_end)
+    ex, ey = point(end_deg, R)
     tangent = (-math.sin(theta_end), math.cos(theta_end))
     normal = (math.cos(theta_end), math.sin(theta_end))
     arrow_len = stroke * 3.1
@@ -99,7 +110,7 @@ def make_master():
     tip = (ex + tangent[0] * arrow_len, ey + tangent[1] * arrow_len)
     base_left = (ex + normal[0] * arrow_half_w, ey + normal[1] * arrow_half_w)
     base_right = (ex - normal[0] * arrow_half_w, ey - normal[1] * arrow_half_w)
-    draw.polygon([tip, base_left, base_right], fill=(255, 255, 255, 235))
+    draw.polygon([tip, base_left, base_right], fill=ring_color)
 
     # Center play triangle.
     play_r = CANVAS * 0.185
