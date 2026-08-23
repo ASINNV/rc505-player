@@ -5,6 +5,7 @@ struct ContentView: View {
     @State private var songs: [Song] = []
     @State private var selectedSongID: Song.ID?
     @StateObject private var playback = PlaybackController()
+    @StateObject private var namesStore = NamesStore()
 
     private static let lastFolderKey = "lastLibraryPath"
 
@@ -27,15 +28,8 @@ struct ContentView: View {
                     Spacer()
                 } else {
                     List(songs, selection: $selectedSongID) { song in
-                        HStack {
-                            Text(song.displayName)
-                            Spacer()
-                            if playback.playingSongID == song.id {
-                                Image(systemName: "speaker.wave.2.fill")
-                                    .foregroundStyle(.tint)
-                            }
-                        }
-                        .tag(song.id)
+                        SongRow(song: song, isPlaying: playback.playingSongID == song.id, namesStore: namesStore)
+                            .tag(song.id)
                     }
                     .listStyle(.sidebar)
                 }
@@ -43,7 +37,7 @@ struct ContentView: View {
             .frame(minWidth: 220)
         } detail: {
             if let song = songs.first(where: { $0.id == selectedSongID }) {
-                SongDetailView(song: song, playback: playback)
+                SongDetailView(song: song, playback: playback, namesStore: namesStore)
             } else {
                 Text("Select a song")
                     .foregroundStyle(.secondary)

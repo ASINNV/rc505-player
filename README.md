@@ -37,6 +37,16 @@ swift run
    a continuous loop until you hit **Stop**.
 4. Click the speaker icon next to any track to mute/unmute it. Muting doesn't
    stop or restart playback, so the remaining tracks stay in sync.
+5. **Rename** a song or track by right-clicking it (or Control-click) and
+   choosing **Rename…**. Custom names are saved and survive relaunching the
+   app or re-choosing the same export folder — they're matched back up by
+   song/track number, not by the folder's original name.
+6. **Export** a song's tracks into one folder by clicking **Export…** in the
+   song's toolbar and picking a destination. This copies all of that song's
+   track files into a single new folder there (named after the song), using
+   your custom track names as filenames when set, and reveals it in Finder
+   when done — handy for grabbing a song's stems without digging through the
+   original `001_1`, `001_2`… folders.
 
 ## How it works / limitations
 
@@ -51,3 +61,30 @@ swift run
   looping means they can drift apart from each other over a long listening
   session — this matches how the RC-505 itself only guarantees same-length
   loops within a synced song, so this shouldn't come up in practice.
+- Custom names are stored in the app's `UserDefaults`, keyed by song/track
+  number — they're per-Mac, not stored inside the export folder itself, so
+  they won't follow the folder if you copy it to another machine.
+
+## Packaging a DMG to install on your other Macs
+
+Running via Xcode (above) is the easiest way to develop and use the app on
+this Mac, but it doesn't produce something you can just copy to another
+machine. To build a real, standalone `RC505Player.app` and wrap it in a DMG:
+
+```sh
+./Scripts/build-dmg.sh
+```
+
+This builds a release binary (universal, so it runs on both Apple Silicon and
+Intel Macs), assembles it into `build/RC505Player.app`, ad-hoc code-signs it,
+and creates `build/RC505Player.dmg`. Share that DMG file (AirDrop, USB drive,
+etc.) with your other Macs — open it and drag `RC505Player.app` into
+`Applications`.
+
+**About Gatekeeper:** this DMG isn't signed with a paid Apple Developer ID or
+notarized, so the first time you open the app on each Mac, macOS will warn
+that it's from an unidentified developer. Right-click (or Control-click) the
+app and choose **Open**, then confirm in the dialog that appears — you only
+need to do this once per Mac. (If macOS blocks it outright with no Open
+option, go to **System Settings → Privacy & Security** and click **Open
+Anyway** next to the RC505Player message.)

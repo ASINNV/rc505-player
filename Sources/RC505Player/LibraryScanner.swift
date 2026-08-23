@@ -35,7 +35,7 @@ enum LibraryScanner {
             guard let songNumber = Int(songLabel), let trackNumber = Int(trackLabel) else { continue }
             guard let audioURL = firstAudioFile(in: entry) else { continue }
 
-            let track = Track(number: trackNumber, name: "Track \(trackNumber)", audioURL: audioURL)
+            let track = Track(key: name, number: trackNumber, defaultName: "Track \(trackNumber)", audioURL: audioURL)
 
             var value = songsByNumber[songNumber] ?? (label: songLabel, tracks: [])
             value.tracks.append(track)
@@ -44,7 +44,7 @@ enum LibraryScanner {
 
         return songsByNumber
             .map { number, value in
-                Song(number: number, label: value.label, tracks: value.tracks.sorted { $0.number < $1.number })
+                Song(key: value.label, number: number, label: value.label, tracks: value.tracks.sorted { $0.number < $1.number })
             }
             .sorted { $0.number < $1.number }
     }
