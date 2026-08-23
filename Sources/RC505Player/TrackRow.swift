@@ -11,6 +11,14 @@ struct TrackRow: View {
     var body: some View {
         HStack {
             Text(track.displayName(using: namesStore))
+            Button {
+                renameText = track.displayName(using: namesStore)
+                isRenaming = true
+            } label: {
+                Image(systemName: "pencil")
+            }
+            .buttonStyle(.borderless)
+            .help("Rename this track")
             Spacer()
             Text(track.audioURL.lastPathComponent)
                 .font(.caption)
