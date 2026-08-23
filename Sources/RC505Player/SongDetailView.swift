@@ -5,6 +5,7 @@ struct SongDetailView: View {
     let song: Song
     @ObservedObject var playback: PlaybackController
     @ObservedObject var namesStore: NamesStore
+    @ObservedObject var organizer: SongOrganizerStore
 
     @State private var isRenamingSong = false
     @State private var renameText = ""
@@ -18,6 +19,15 @@ struct SongDetailView: View {
                 Text(song.displayName(using: namesStore))
                     .font(.largeTitle)
                     .bold()
+
+                Button {
+                    organizer.toggleFavorite(song)
+                } label: {
+                    Image(systemName: organizer.isFavorite(song) ? "star.fill" : "star")
+                }
+                .buttonStyle(.borderless)
+                .foregroundStyle(organizer.isFavorite(song) ? .white : .secondary)
+                .help(organizer.isFavorite(song) ? "Remove from Favorites" : "Add to Favorites")
 
                 Button {
                     renameText = song.displayName(using: namesStore)
@@ -50,6 +60,7 @@ struct SongDetailView: View {
                 }
                 .buttonStyle(.borderedProminent)
                 .controlSize(.large)
+                .keyboardShortcut(.space, modifiers: [])
             }
             .alert("Rename Song", isPresented: $isRenamingSong) {
                 TextField("Name", text: $renameText)
@@ -62,9 +73,27 @@ struct SongDetailView: View {
 
             Divider()
 
-            List(song.tracks) { track in
-                TrackRow(track: track, playback: playback, namesStore: namesStore)
+            List {
+                ForEach(song.tracks) { track in
+                    TrackRow(track: track, playback: playback, namesStore: namesStore)
+                        .listRowInsets(EdgeInsets(top: 6, leading: 0, bottom: 6, trailing: 0))
+                }
+
+                HStack {
+                    Spacer()
+                    Button {
+                        playback.unmuteAll(song.tracks)
+                    } label: {
+                        Text("Unmute All")
+                    }
+                    .buttonStyle(.bordered)
+                    .disabled(!song.tracks.contains { playback.isMuted($0) })
+                    .help("Unmute every track in this song")
+                }
+                .listRowInsets(EdgeInsets(top: 14, leading: 0, bottom: 6, trailing: 0))
+                .listRowSeparator(.hidden)
             }
+            .listStyle(.plain)
         }
         .padding()
         .id(song.id)
