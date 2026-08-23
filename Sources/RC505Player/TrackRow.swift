@@ -38,6 +38,15 @@ struct TrackRow: View {
             Text(track.audioURL.lastPathComponent)
                 .font(.caption)
                 .foregroundStyle(.tertiary)
+            Image(systemName: "speaker.wave.1.fill")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            Slider(value: Binding(
+                get: { playback.volume(for: track) },
+                set: { playback.setVolume($0, for: track) }
+            ), in: 0...1)
+            .frame(width: 90)
+            .help("Track volume")
             Button {
                 playback.toggleMute(track)
             } label: {

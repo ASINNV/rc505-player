@@ -40,6 +40,12 @@ struct SongDetailView: View {
 
                 Spacer()
 
+                Image(systemName: "speaker.wave.2.fill")
+                    .foregroundStyle(.secondary)
+                Slider(value: $playback.masterVolume, in: 0...1)
+                    .frame(width: 110)
+                    .help("Master volume")
+
                 Button {
                     exportSong()
                 } label: {

@@ -40,7 +40,9 @@ swift run
    silences until you turn solo off or click Solo on another track). Neither
    stops or restarts playback, so the remaining tracks stay in sync. An
    **Unmute All** button above the track list clears every mute in the song
-   at once.
+   at once. Each track also has its own volume slider for balancing tracks
+   against each other, and a master volume slider (next to Export/Play in
+   the song header) controls the overall output level.
 5. Press **spacebar** to play/stop the currently selected song without
    reaching for the mouse.
 6. Hover a song or track name to reveal a pencil icon — click it (or
