@@ -5,9 +5,8 @@ struct SongRow: View {
     let isPlaying: Bool
     @ObservedObject var namesStore: NamesStore
     @ObservedObject var organizer: SongOrganizerStore
+    let onRename: () -> Void
 
-    @State private var isRenaming = false
-    @State private var renameText = ""
     @State private var isRowHovering = false
     @State private var isNameHovering = false
 
@@ -29,10 +28,7 @@ struct SongRow: View {
             HStack(spacing: 6) {
                 Text(song.displayName(using: namesStore))
 
-                Button {
-                    renameText = song.displayName(using: namesStore)
-                    isRenaming = true
-                } label: {
+                Button(action: onRename) {
                     Image(systemName: "pencil")
                 }
                 .buttonStyle(.borderless)
@@ -64,18 +60,10 @@ struct SongRow: View {
             }
         }
         .contextMenu {
-            Button("Rename…") {
-                renameText = song.displayName(using: namesStore)
-                isRenaming = true
-            }
+            Button("Rename…", action: onRename)
             Button(isFavorite ? "Remove from Favorites" : "Add to Favorites") {
                 organizer.toggleFavorite(song)
             }
-        }
-        .alert("Rename Song", isPresented: $isRenaming) {
-            TextField("Name", text: $renameText)
-            Button("Save") { namesStore.setName(renameText, for: song.key) }
-            Button("Cancel", role: .cancel) {}
         }
     }
 }

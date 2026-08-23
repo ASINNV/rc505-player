@@ -11,6 +11,8 @@ struct ContentView: View {
     @State private var selectedSongID: Song.ID?
     @State private var sidebarTab: SidebarTab = .all
     @State private var exportAllError: String?
+    @State private var renamingSong: Song?
+    @State private var renameText = ""
     @StateObject private var playback = PlaybackController()
     @StateObject private var namesStore = NamesStore()
     @StateObject private var organizer = SongOrganizerStore()
@@ -26,6 +28,26 @@ struct ContentView: View {
                     Label("Choose Export Folder…", systemImage: "folder")
                 }
                 .padding()
+
+                // Invisible triggers so R/Return renames and F favorites
+                // whichever song is currently selected in the sidebar.
+                Button("") { startRenaming(selectedSong) }
+                    .keyboardShortcut("r", modifiers: [])
+                    .disabled(selectedSong == nil)
+                    .frame(width: 0, height: 0)
+                    .opacity(0)
+                Button("") { startRenaming(selectedSong) }
+                    .keyboardShortcut(.return, modifiers: [])
+                    .disabled(selectedSong == nil)
+                    .frame(width: 0, height: 0)
+                    .opacity(0)
+                Button("") {
+                    if let selectedSong { organizer.toggleFavorite(selectedSong) }
+                }
+                .keyboardShortcut("f", modifiers: [])
+                .disabled(selectedSong == nil)
+                .frame(width: 0, height: 0)
+                .opacity(0)
 
                 if songs.isEmpty {
                     Spacer()
@@ -57,7 +79,7 @@ struct ContentView: View {
                     } else {
                         List(selection: $selectedSongID) {
                             ForEach(displayedSongs) { song in
-                                SongRow(song: song, isPlaying: playback.playingSongID == song.id, namesStore: namesStore, organizer: organizer)
+                                SongRow(song: song, isPlaying: playback.playingSongID == song.id, namesStore: namesStore, organizer: organizer, onRename: { startRenaming(song) })
                                     .tag(song.id)
                             }
                             .onMove { indices, newOffset in
@@ -82,7 +104,7 @@ struct ContentView: View {
             }
             .frame(minWidth: 220)
         } detail: {
-            if let song = songs.first(where: { $0.id == selectedSongID }) {
+            if let song = selectedSong {
                 SongDetailView(song: song, playback: playback, namesStore: namesStore, organizer: organizer)
             } else {
                 Text("Select a song")
@@ -90,6 +112,18 @@ struct ContentView: View {
             }
         }
         .onAppear(perform: restoreLastFolder)
+        .alert("Rename Song", isPresented: Binding(
+            get: { renamingSong != nil },
+            set: { if !$0 { renamingSong = nil } }
+        )) {
+            TextField("Name", text: $renameText)
+            Button("Save") {
+                if let renamingSong {
+                    namesStore.setName(renameText, for: renamingSong.key)
+                }
+            }
+            Button("Cancel", role: .cancel) {}
+        }
         .alert("Export Failed", isPresented: Binding(
             get: { exportAllError != nil },
             set: { if !$0 { exportAllError = nil } }
@@ -98,6 +132,16 @@ struct ContentView: View {
         } message: {
             Text(exportAllError ?? "")
         }
+    }
+
+    private var selectedSong: Song? {
+        songs.first(where: { $0.id == selectedSongID })
+    }
+
+    private func startRenaming(_ song: Song?) {
+        guard let song else { return }
+        renameText = song.displayName(using: namesStore)
+        renamingSong = song
     }
 
     private func exportAllFavorites(_ favorites: [Song]) {

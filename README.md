@@ -47,7 +47,9 @@ swift run
    right-click the row and choose **Rename…**) to rename it. Custom names
    are saved and survive relaunching the app or re-choosing the same export
    folder — they're matched back up by song/track number, not by the
-   folder's original name.
+   folder's original name. With a song selected in the sidebar, **R** or
+   **Return** opens the rename prompt for it directly, and **F** toggles it
+   as a favorite, without needing the mouse.
 7. **Export** a song's tracks into one folder by clicking **Export…** in the
    song's toolbar and picking a destination. This copies all of that song's
    track files into a single new folder there (named after the song), using
