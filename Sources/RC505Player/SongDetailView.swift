@@ -1,0 +1,98 @@
+import SwiftUI
+import AppKit
+
+struct SongDetailView: View {
+    let song: Song
+    @ObservedObject var playback: PlaybackController
+    @ObservedObject var namesStore: NamesStore
+
+    @State private var isRenamingSong = false
+    @State private var renameText = ""
+    @State private var exportError: String?
+
+    private var isPlayingThisSong: Bool { playback.playingSongID == song.id }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack {
+                Text(song.displayName(using: namesStore))
+                    .font(.largeTitle)
+                    .bold()
+
+                Button {
+                    renameText = song.displayName(using: namesStore)
+                    isRenamingSong = true
+                } label: {
+                    Image(systemName: "pencil")
+                }
+                .buttonStyle(.borderless)
+                .help("Rename this song")
+
+                Spacer()
+
+                Button {
+                    exportSong()
+                } label: {
+                    Label("Export…", systemImage: "square.and.arrow.up")
+                }
+                .buttonStyle(.bordered)
+                .help("Copy all of this song's tracks into one folder")
+
+                Button {
+                    if isPlayingThisSong {
+                        playback.stop()
+                    } else {
+                        playback.play(song: song)
+                    }
+                } label: {
+                    Label(isPlayingThisSong ? "Stop" : "Play", systemImage: isPlayingThisSong ? "stop.fill" : "play.fill")
+                        .font(.title3)
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
+            }
+            .alert("Rename Song", isPresented: $isRenamingSong) {
+                TextField("Name", text: $renameText)
+                Button("Save") { namesStore.setName(renameText, for: song.key) }
+                Button("Cancel", role: .cancel) {}
+            }
+
+            Text("\(song.tracks.count) track\(song.tracks.count == 1 ? "" : "s") · loops continuously until stopped")
+                .foregroundStyle(.secondary)
+
+            Divider()
+
+            List(song.tracks) { track in
+                TrackRow(track: track, playback: playback, namesStore: namesStore)
+            }
+        }
+        .padding()
+        .id(song.id)
+        .alert("Export Failed", isPresented: Binding(
+            get: { exportError != nil },
+            set: { if !$0 { exportError = nil } }
+        )) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(exportError ?? "")
+        }
+    }
+
+    private func exportSong() {
+        let panel = NSOpenPanel()
+        panel.canChooseDirectories = true
+        panel.canChooseFiles = false
+        panel.canCreateDirectories = true
+        panel.prompt = "Export Here"
+        panel.message = "Choose a location to export \"\(song.displayName(using: namesStore))\" into"
+
+        guard panel.runModal() == .OK, let destination = panel.url else { return }
+
+        do {
+            let folder = try LibraryExporter.export(song: song, namesStore: namesStore, to: destination)
+            NSWorkspace.shared.activateFileViewerSelecting([folder])
+        } catch {
+            exportError = error.localizedDescription
+        }
+    }
+}
