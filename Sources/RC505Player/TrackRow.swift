@@ -16,14 +16,6 @@ struct TrackRow: View {
                 .font(.caption)
                 .foregroundStyle(.tertiary)
             Button {
-                playback.toggleMute(track)
-            } label: {
-                Image(systemName: playback.isMuted(track) ? "speaker.slash.fill" : "speaker.wave.2.fill")
-                    .foregroundStyle(playback.isMuted(track) ? .red : .primary)
-            }
-            .buttonStyle(.borderless)
-            .help(playback.isMuted(track) ? "Unmute this track" : "Mute this track")
-            Button {
                 renameText = track.displayName(using: namesStore)
                 isRenaming = true
             } label: {
@@ -31,6 +23,14 @@ struct TrackRow: View {
             }
             .buttonStyle(.borderless)
             .help("Rename this track")
+            Button {
+                playback.toggleMute(track)
+            } label: {
+                Text("Mute")
+            }
+            .buttonStyle(.borderedProminent)
+            .tint(playback.isMuted(track) ? .gray : .blue)
+            .help(playback.isMuted(track) ? "Unmute this track" : "Mute this track")
         }
         .opacity(playback.isMuted(track) ? 0.5 : 1.0)
         .contextMenu {
