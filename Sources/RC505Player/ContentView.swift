@@ -29,10 +29,13 @@ struct ContentView: View {
                 }
                 .padding()
 
-                // Invisible triggers so R/Return renames and F favorites
-                // whichever song is currently selected in the sidebar.
+                // Invisible triggers so Cmd+R/Return renames and Cmd+F
+                // favorites whichever song is currently selected in the
+                // sidebar. Plain "r"/"f" would collide with the sidebar
+                // List's native type-ahead-to-select behavior, which
+                // intercepts unmodified letter keys.
                 Button("") { startRenaming(selectedSong) }
-                    .keyboardShortcut("r", modifiers: [])
+                    .keyboardShortcut("r", modifiers: [.command])
                     .disabled(selectedSong == nil)
                     .frame(width: 0, height: 0)
                     .opacity(0)
@@ -44,7 +47,7 @@ struct ContentView: View {
                 Button("") {
                     if let selectedSong { organizer.toggleFavorite(selectedSong) }
                 }
-                .keyboardShortcut("f", modifiers: [])
+                .keyboardShortcut("f", modifiers: [.command])
                 .disabled(selectedSong == nil)
                 .frame(width: 0, height: 0)
                 .opacity(0)
