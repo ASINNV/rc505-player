@@ -9,6 +9,7 @@ struct Track: Identifiable, Hashable {
     let defaultName: String
     let audioURL: URL
 
+    @MainActor
     func displayName(using store: NamesStore) -> String {
         store.name(for: key) ?? defaultName
     }
@@ -25,6 +26,7 @@ struct Song: Identifiable, Hashable {
 
     var defaultDisplayName: String { "Song \(label)" }
 
+    @MainActor
     func displayName(using store: NamesStore) -> String {
         store.name(for: key) ?? defaultDisplayName
     }
