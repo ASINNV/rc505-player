@@ -9,12 +9,28 @@ final class PlaybackController: ObservableObject {
     @Published private(set) var playingSongID: Song.ID?
     @Published private var mutedTrackIDs: Set<Track.ID> = []
     @Published private var soloedTrackID: Track.ID?
+    @Published private var trackVolumes: [Track.ID: Float] = [:]
+
+    /// Overall output level, applied via the audio engine's main mixer
+    /// rather than folded into each track's own volume.
+    @Published var masterVolume: Float = 1.0 {
+        didSet { engine.mainMixerNode.outputVolume = masterVolume }
+    }
 
     private let engine = AVAudioEngine()
     private var players: [Track.ID: AVAudioPlayerNode] = [:]
 
     func isMuted(_ track: Track) -> Bool {
         mutedTrackIDs.contains(track.id)
+    }
+
+    func volume(for track: Track) -> Float {
+        trackVolumes[track.id] ?? 1.0
+    }
+
+    func setVolume(_ volume: Float, for track: Track) {
+        trackVolumes[track.id] = volume
+        applyVolumes()
     }
 
     func isSoloed(_ track: Track) -> Bool {
@@ -51,10 +67,13 @@ final class PlaybackController: ObservableObject {
     }
 
     private func effectiveVolume(for trackID: Track.ID) -> Float {
+        let base: Float
         if let soloedTrackID {
-            return soloedTrackID == trackID ? 1 : 0
+            base = soloedTrackID == trackID ? 1 : 0
+        } else {
+            base = mutedTrackIDs.contains(trackID) ? 0 : 1
         }
-        return mutedTrackIDs.contains(trackID) ? 0 : 1
+        return base * (trackVolumes[trackID] ?? 1.0)
     }
 
     private func applyVolumes() {
