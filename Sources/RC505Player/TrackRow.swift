@@ -11,14 +11,6 @@ struct TrackRow: View {
     var body: some View {
         HStack {
             Text(track.displayName(using: namesStore))
-            Button {
-                renameText = track.displayName(using: namesStore)
-                isRenaming = true
-            } label: {
-                Image(systemName: "pencil")
-            }
-            .buttonStyle(.borderless)
-            .help("Rename this track")
             Spacer()
             Text(track.audioURL.lastPathComponent)
                 .font(.caption)
@@ -31,6 +23,14 @@ struct TrackRow: View {
             }
             .buttonStyle(.borderless)
             .help(playback.isMuted(track) ? "Unmute this track" : "Mute this track")
+            Button {
+                renameText = track.displayName(using: namesStore)
+                isRenaming = true
+            } label: {
+                Image(systemName: "pencil")
+            }
+            .buttonStyle(.borderless)
+            .help("Rename this track")
         }
         .opacity(playback.isMuted(track) ? 0.5 : 1.0)
         .contextMenu {

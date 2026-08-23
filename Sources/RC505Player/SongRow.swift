@@ -13,6 +13,12 @@ struct SongRow: View {
         HStack {
             Text(song.displayName(using: namesStore))
 
+            Spacer()
+            if isPlaying {
+                Image(systemName: "speaker.wave.2.fill")
+                    .foregroundStyle(.tint)
+            }
+
             Button {
                 renameText = song.displayName(using: namesStore)
                 isRenaming = true
@@ -23,12 +29,6 @@ struct SongRow: View {
             .help("Rename this song")
             .opacity(isHovering ? 1 : 0)
             .allowsHitTesting(isHovering)
-
-            Spacer()
-            if isPlaying {
-                Image(systemName: "speaker.wave.2.fill")
-                    .foregroundStyle(.tint)
-            }
         }
         .onHover { hovering in
             isHovering = hovering
