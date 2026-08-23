@@ -25,7 +25,7 @@ struct ContentView: View {
                 Button {
                     chooseFolder()
                 } label: {
-                    Label("Choose Export Folder…", systemImage: "folder")
+                    Label("Choose Import Folder…", systemImage: "folder")
                 }
                 .padding()
 
@@ -198,6 +198,16 @@ struct ContentView: View {
     }
 
     private func loadLibrary(from url: URL) {
+        let previousPath = UserDefaults.standard.string(forKey: Self.lastFolderKey)
+        if let previousPath, previousPath != url.path {
+            // Switching to a genuinely different folder: song/track keys
+            // are just numbers (e.g. "001"), so a new batch's numbering
+            // can collide with an old batch's and make old names/favorites
+            // appear to carry over onto new, unrelated songs.
+            namesStore.clearAll()
+            organizer.clearAll()
+        }
+
         playback.stop()
         songs = LibraryScanner.scan(rootURL: url)
         selectedSongID = songs.first?.id

@@ -84,4 +84,16 @@ final class SongOrganizerStore: ObservableObject {
         orderedKeys = newOrder
         UserDefaults.standard.set(orderedKeys, forKey: Self.orderDefaultsKey)
     }
+
+    /// Clears every favorite and the custom order. Used when switching to a
+    /// different export folder, since song keys are just numbers (e.g.
+    /// "001") and a new batch's numbering can otherwise collide with an old
+    /// batch's, making old favorites/ordering appear to "carry over" onto
+    /// new songs that just happen to share a number.
+    func clearAll() {
+        favoriteKeys.removeAll()
+        orderedKeys.removeAll()
+        UserDefaults.standard.removeObject(forKey: Self.favoritesDefaultsKey)
+        UserDefaults.standard.removeObject(forKey: Self.orderDefaultsKey)
+    }
 }

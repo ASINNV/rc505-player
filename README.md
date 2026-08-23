@@ -28,9 +28,15 @@ swift run
 
 ## Using it
 
-1. Click **Choose Export Folder…** and select the top-level folder that
+1. Click **Choose Import Folder…** and select the top-level folder that
    contains all your song/track subfolders (the one with `001_1`, `001_2`,
    `001_3`… inside it). The app remembers this folder on next launch.
+   Switching to a *different* folder than the one you had loaded clears
+   custom names, favorites, and custom ordering first — song/track keys are
+   just numbers, so without this a new export batch that also starts
+   numbering at 001 would otherwise inherit an old batch's names/favorites
+   on unrelated songs. Reloading the *same* folder (including on relaunch)
+   never clears anything.
 2. Songs appear in the sidebar, grouped and numbered automatically from the
    folder names.
 3. Select a song, hit **Play** — every track for that song plays together on
