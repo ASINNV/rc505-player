@@ -76,10 +76,16 @@ machine. To build a real, standalone `RC505Player.app` and wrap it in a DMG:
 ```
 
 This builds a release binary (universal, so it runs on both Apple Silicon and
-Intel Macs), assembles it into `build/RC505Player.app`, ad-hoc code-signs it,
-and creates `build/RC505Player.dmg`. Share that DMG file (AirDrop, USB drive,
-etc.) with your other Macs — open it and drag `RC505Player.app` into
-`Applications`.
+Intel Macs), assembles it into `build/RC505Player.app` (including the app
+icon from `Resources/AppIcon.icns`), ad-hoc code-signs it, and creates
+`build/RC505Player.dmg`. Share that DMG file (AirDrop, USB drive, etc.) with
+your other Macs — open it and drag `RC505Player.app` into `Applications`.
+
+Note: the app icon only shows up on the packaged `.app` built this way, not
+when running via Xcode/`swift run` — Swift Package executables launched that
+way don't get a real app bundle, so Xcode shows a generic icon in the Dock
+during development regardless. That's cosmetic and doesn't affect anything
+else.
 
 **About Gatekeeper:** this DMG isn't signed with a paid Apple Developer ID or
 notarized, so the first time you open the app on each Mac, macOS will warn
