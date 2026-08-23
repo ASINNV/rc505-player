@@ -32,7 +32,7 @@ struct ContentView: View {
                 // Invisible triggers so R/Return renames and F favorites
                 // whichever song is currently selected in the sidebar.
                 Button("") { startRenaming(selectedSong) }
-                    .keyboardShortcut("r", modifiers: [])
+                    .keyboardShortcut("r", modifiers: [.command])
                     .disabled(selectedSong == nil)
                     .frame(width: 0, height: 0)
                     .opacity(0)
@@ -44,7 +44,7 @@ struct ContentView: View {
                 Button("") {
                     if let selectedSong { organizer.toggleFavorite(selectedSong) }
                 }
-                .keyboardShortcut("f", modifiers: [])
+                .keyboardShortcut("f", modifiers: [.command])
                 .disabled(selectedSong == nil)
                 .frame(width: 0, height: 0)
                 .opacity(0)
