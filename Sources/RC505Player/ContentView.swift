@@ -25,12 +25,15 @@ struct ContentView: View {
                 Button {
                     chooseFolder()
                 } label: {
-                    Label("Choose Export Folder…", systemImage: "folder")
+                    Label("Choose Import Folder…", systemImage: "folder")
                 }
                 .padding()
 
-                // Invisible triggers so R/Return renames and F favorites
-                // whichever song is currently selected in the sidebar.
+                // Invisible triggers so Cmd+R/Return renames and Cmd+F
+                // favorites whichever song is currently selected in the
+                // sidebar. Plain "r"/"f" would collide with the sidebar
+                // List's native type-ahead-to-select behavior, which
+                // intercepts unmodified letter keys.
                 Button("") { startRenaming(selectedSong) }
                     .keyboardShortcut("r", modifiers: [.command])
                     .disabled(selectedSong == nil)
@@ -195,6 +198,16 @@ struct ContentView: View {
     }
 
     private func loadLibrary(from url: URL) {
+        let previousPath = UserDefaults.standard.string(forKey: Self.lastFolderKey)
+        if let previousPath, previousPath != url.path {
+            // Switching to a genuinely different folder: song/track keys
+            // are just numbers (e.g. "001"), so a new batch's numbering
+            // can collide with an old batch's and make old names/favorites
+            // appear to carry over onto new, unrelated songs.
+            namesStore.clearAll()
+            organizer.clearAll()
+        }
+
         playback.stop()
         songs = LibraryScanner.scan(rootURL: url)
         selectedSongID = songs.first?.id
