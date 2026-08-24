@@ -26,7 +26,7 @@ struct SongDetailView: View {
                     Image(systemName: organizer.isFavorite(song) ? "star.fill" : "star")
                 }
                 .buttonStyle(.borderless)
-                .foregroundStyle(organizer.isFavorite(song) ? .white : .secondary)
+                .foregroundStyle(organizer.isFavorite(song) ? .favoriteGold : .secondary)
                 .help(organizer.isFavorite(song) ? "Remove from Favorites" : "Add to Favorites")
 
                 Button {

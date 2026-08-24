@@ -20,7 +20,7 @@ struct SongRow: View {
                 Image(systemName: isFavorite ? "star.fill" : "star")
             }
             .buttonStyle(.borderless)
-            .foregroundStyle(isFavorite ? .white : .secondary)
+            .foregroundStyle(isFavorite ? .favoriteGold : .secondary)
             .help(isFavorite ? "Remove from Favorites (CMD+F)" : "Add to Favorites (CMD+F)")
             .opacity((isFavorite || isRowHovering) ? 1 : 0)
             .allowsHitTesting(isFavorite || isRowHovering)
