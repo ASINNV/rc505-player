@@ -68,7 +68,7 @@ swift run
    original `001_1`, `001_2`… folders.
 8. The sidebar has two tabs, **All Songs** and **Favorites**. Hover a song
    row to reveal a star on its left — click it to favorite the song (the
-   star turns solid white and stays visible even without hovering); the
+   star turns solid gold and stays visible even without hovering); the
    song then also appears under the Favorites tab. The song detail page has
    its own star next to the title for the same toggle, always visible.
 9. **Drag and drop** songs in the sidebar — grab anywhere on a row and drop
