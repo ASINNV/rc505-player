@@ -8,6 +8,7 @@ private enum SidebarTab: String, CaseIterable, Hashable {
 
 struct ContentView: View {
     @State private var songs: [Song] = []
+    @State private var libraryURL: URL?
     @State private var selectedSongID: Song.ID?
     @State private var sidebarTab: SidebarTab = .all
     @State private var exportAllError: String?
@@ -114,6 +115,21 @@ struct ContentView: View {
                     .foregroundStyle(.secondary)
             }
         }
+        .navigationTitle("RC-505 Player")
+        .toolbar {
+            if let libraryURL {
+                // .status is the toolbar slot meant for plain, non-interactive
+                // labels - unlike .primaryAction, macOS doesn't wrap it in the
+                // rounded button-style background.
+                ToolbarItem(placement: .status) {
+                    Text(libraryURL.lastPathComponent)
+                        .fontWeight(.regular)
+                        .foregroundStyle(.secondary)
+                        .opacity(0.6)
+                        .padding(.horizontal, 10)
+                }
+            }
+        }
         .onAppear(perform: restoreLastFolder)
         .alert("Rename Song", isPresented: Binding(
             get: { renamingSong != nil },
@@ -211,6 +227,7 @@ struct ContentView: View {
         playback.stop()
         songs = LibraryScanner.scan(rootURL: url)
         selectedSongID = songs.first?.id
+        libraryURL = url
         UserDefaults.standard.set(url.path, forKey: Self.lastFolderKey)
     }
 
