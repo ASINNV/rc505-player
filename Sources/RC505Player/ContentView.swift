@@ -116,17 +116,18 @@ struct ContentView: View {
             }
         }
         .navigationTitle("RC-505 Player")
-        .toolbar {
+        .overlay(alignment: .topTrailing) {
+            // Drawn in our own content rather than the native toolbar:
+            // macOS's toolbar chrome wraps every item (any placement) in a
+            // rounded capsule background with no per-item opt-out, which a
+            // plain status label shouldn't have.
             if let libraryURL {
-                // .status is the toolbar slot meant for plain, non-interactive
-                // labels - unlike .primaryAction, macOS doesn't wrap it in the
-                // rounded button-style background.
-                ToolbarItem(placement: .status) {
-                    Text(libraryURL.lastPathComponent)
-                        .fontWeight(.regular)
-                        .foregroundStyle(.secondary)
-                        .opacity(0.6)
-                }
+                Text(libraryURL.lastPathComponent)
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+                    .opacity(0.6)
+                    .padding(.top, 6)
+                    .padding(.trailing, 12)
             }
         }
         .onAppear(perform: restoreLastFolder)
