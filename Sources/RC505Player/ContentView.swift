@@ -8,6 +8,7 @@ private enum SidebarTab: String, CaseIterable, Hashable {
 
 struct ContentView: View {
     @State private var songs: [Song] = []
+    @State private var libraryURL: URL?
     @State private var selectedSongID: Song.ID?
     @State private var sidebarTab: SidebarTab = .all
     @State private var exportAllError: String?
@@ -114,6 +115,7 @@ struct ContentView: View {
                     .foregroundStyle(.secondary)
             }
         }
+        .navigationTitle(libraryURL.map { "RC-505 Player — \($0.lastPathComponent)" } ?? "RC-505 Player")
         .onAppear(perform: restoreLastFolder)
         .alert("Rename Song", isPresented: Binding(
             get: { renamingSong != nil },
@@ -211,6 +213,7 @@ struct ContentView: View {
         playback.stop()
         songs = LibraryScanner.scan(rootURL: url)
         selectedSongID = songs.first?.id
+        libraryURL = url
         UserDefaults.standard.set(url.path, forKey: Self.lastFolderKey)
     }
 
