@@ -36,9 +36,10 @@ swift run
    just numbers, so without this a new export batch that also starts
    numbering at 001 would otherwise inherit an old batch's names/favorites
    on unrelated songs. Reloading the *same* folder (including on relaunch)
-   never clears anything. The window's title bar always shows which folder
-   is currently loaded ("RC-505 Player — FolderName"), so it's easy to
-   tell at a glance which batch you're working in.
+   never clears anything. The currently loaded folder's name is always
+   shown at the right edge of the title bar (dimmed, so it doesn't compete
+   with the window title), so it's easy to tell at a glance which batch
+   you're working in.
 2. Songs appear in the sidebar, grouped and numbered automatically from the
    folder names.
 3. Select a song, hit **Play** — every track for that song plays together on

@@ -115,7 +115,17 @@ struct ContentView: View {
                     .foregroundStyle(.secondary)
             }
         }
-        .navigationTitle(libraryURL.map { "RC-505 Player — \($0.lastPathComponent)" } ?? "RC-505 Player")
+        .navigationTitle("RC-505 Player")
+        .toolbar {
+            if let libraryURL {
+                ToolbarItem(placement: .primaryAction) {
+                    Text(libraryURL.lastPathComponent)
+                        .fontWeight(.regular)
+                        .foregroundStyle(.secondary)
+                        .opacity(0.6)
+                }
+            }
+        }
         .onAppear(perform: restoreLastFolder)
         .alert("Rename Song", isPresented: Binding(
             get: { renamingSong != nil },
