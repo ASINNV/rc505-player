@@ -80,9 +80,11 @@ swift run
    Favorites doesn't disturb where those songs sit in All Songs, and vice
    versa.
 10. An **Export All** button sits below the list on the Favorites tab —
-    click it and pick a destination to export every favorite song's tracks
-    at once (each into its own folder there, same as the per-song Export),
-    then reveals them all in Finder.
+    click it, then type a name and choose a location for the folder that
+    will hold all your favorite songs' tracks (defaults to "Favorites",
+    but you can call it anything). Each favorite song gets its own
+    subfolder inside it, same as the per-song Export, and Finder opens to
+    reveal the result when done.
 
 Both favorites and the order are saved and survive relaunching or
    re-scanning the same folder.

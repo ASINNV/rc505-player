@@ -161,18 +161,17 @@ struct ContentView: View {
     }
 
     private func exportAllFavorites(_ favorites: [Song]) {
-        let panel = NSOpenPanel()
-        panel.canChooseDirectories = true
-        panel.canChooseFiles = false
+        let panel = NSSavePanel()
+        panel.nameFieldStringValue = "Favorites"
         panel.canCreateDirectories = true
-        panel.prompt = "Export Here"
-        panel.message = "Choose a location to export your \(favorites.count) favorite song\(favorites.count == 1 ? "" : "s") into"
+        panel.prompt = "Export"
+        panel.title = "Export Favorites"
+        panel.message = "Choose a name and location for your \(favorites.count) favorite song\(favorites.count == 1 ? "" : "s")"
 
-        guard panel.runModal() == .OK, let destination = panel.url else { return }
+        guard panel.runModal() == .OK, let folderURL = panel.url else { return }
 
-        let favoritesFolder: URL
         do {
-            favoritesFolder = try LibraryExporter.makeGroupFolder(named: "Favorites", in: destination)
+            try FileManager.default.createDirectory(at: folderURL, withIntermediateDirectories: true)
         } catch {
             exportAllError = error.localizedDescription
             return
@@ -183,7 +182,7 @@ struct ContentView: View {
 
         for song in favorites {
             do {
-                _ = try LibraryExporter.export(song: song, namesStore: namesStore, to: favoritesFolder)
+                _ = try LibraryExporter.export(song: song, namesStore: namesStore, to: folderURL)
                 exportedAny = true
             } catch {
                 failures.append("\(song.displayName(using: namesStore)): \(error.localizedDescription)")
@@ -191,7 +190,7 @@ struct ContentView: View {
         }
 
         if exportedAny {
-            NSWorkspace.shared.activateFileViewerSelecting([favoritesFolder])
+            NSWorkspace.shared.activateFileViewerSelecting([folderURL])
         }
         if !failures.isEmpty {
             exportAllError = failures.joined(separator: "\n")
