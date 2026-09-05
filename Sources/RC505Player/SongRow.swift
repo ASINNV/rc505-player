@@ -21,7 +21,7 @@ struct SongRow: View {
             }
             .buttonStyle(.borderless)
             .foregroundStyle(isFavorite ? .favoriteGold : .secondary)
-            .help(isFavorite ? "Remove from Favorites" : "Add to Favorites")
+            .help(isFavorite ? "Remove from Favorites (CMD+F)" : "Add to Favorites (CMD+F)")
             .opacity((isFavorite || isRowHovering) ? 1 : 0)
             .allowsHitTesting(isFavorite || isRowHovering)
 
@@ -32,7 +32,7 @@ struct SongRow: View {
                     Image(systemName: "pencil")
                 }
                 .buttonStyle(.borderless)
-                .help("Rename this song")
+                .help("Rename this song (CMD+R)")
                 .opacity(isNameHovering ? 1 : 0)
                 .allowsHitTesting(isNameHovering)
             }
@@ -61,7 +61,7 @@ struct SongRow: View {
         }
         .contextMenu {
             Button("Rename…", action: onRename)
-            Button(isFavorite ? "Remove from Favorites" : "Add to Favorites") {
+            Button(isFavorite ? "Remove from Favorites (CMD+F)" : "Add to Favorites (CMD+F)") {
                 organizer.toggleFavorite(song)
             }
         }

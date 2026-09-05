@@ -116,8 +116,12 @@ struct ContentView: View {
             }
         }
         .navigationTitle("RC-505 Player")
+                .navigationTitle("RC-505 Player")
         .toolbar {
             if let libraryURL {
+                // .status is the toolbar slot meant for plain, non-interactive
+                // labels - unlike .primaryAction, macOS doesn't wrap it in the
+                // rounded button-style background.
                 ToolbarItem(placement: .status) {
                     Text(libraryURL.lastPathComponent)
                         .fontWeight(.regular)
