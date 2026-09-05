@@ -14,14 +14,6 @@ enum LibraryExporter {
         }
     }
 
-    /// Creates a uniquely-named subfolder (e.g. "Favorites") inside
-    /// `destinationParent`, for grouping multiple exported songs together.
-    static func makeGroupFolder(named name: String, in destinationParent: URL) throws -> URL {
-        let folderURL = uniqueURL(for: sanitize(name), in: destinationParent)
-        try FileManager.default.createDirectory(at: folderURL, withIntermediateDirectories: true)
-        return folderURL
-    }
-
     @MainActor
     static func export(song: Song, namesStore: NamesStore, to destinationParent: URL) throws -> URL {
         guard !song.tracks.isEmpty else { throw ExportError.noTracks }

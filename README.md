@@ -28,9 +28,18 @@ swift run
 
 ## Using it
 
-1. Click **Choose Export Folder…** and select the top-level folder that
+1. Click **Choose Import Folder…** and select the top-level folder that
    contains all your song/track subfolders (the one with `001_1`, `001_2`,
    `001_3`… inside it). The app remembers this folder on next launch.
+   Switching to a *different* folder than the one you had loaded clears
+   custom names, favorites, and custom ordering first — song/track keys are
+   just numbers, so without this a new export batch that also starts
+   numbering at 001 would otherwise inherit an old batch's names/favorites
+   on unrelated songs. Reloading the *same* folder (including on relaunch)
+   never clears anything. The currently loaded folder's name is always
+   shown at the right edge of the title bar (dimmed, so it doesn't compete
+   with the window title), so it's easy to tell at a glance which batch
+   you're working in.
 2. Songs appear in the sidebar, grouped and numbered automatically from the
    folder names.
 3. Select a song, hit **Play** — every track for that song plays together on
@@ -40,14 +49,20 @@ swift run
    silences until you turn solo off or click Solo on another track). Neither
    stops or restarts playback, so the remaining tracks stay in sync. An
    **Unmute All** button above the track list clears every mute in the song
-   at once.
+   at once. Each track also has its own volume slider for balancing tracks
+   against each other, and a master volume slider (next to Export/Play in
+   the song header) controls the overall output level.
 5. Press **spacebar** to play/stop the currently selected song without
    reaching for the mouse.
 6. Hover a song or track name to reveal a pencil icon — click it (or
    right-click the row and choose **Rename…**) to rename it. Custom names
    are saved and survive relaunching the app or re-choosing the same export
    folder — they're matched back up by song/track number, not by the
-   folder's original name.
+   folder's original name. With a song selected in the sidebar, **⌘R** or
+   **Return** opens the rename prompt for it directly, and **⌘F** toggles
+   it as a favorite, without needing the mouse. (Plain R/F aren't used
+   since the sidebar list's native type-ahead-to-select would intercept
+   them.)
 7. **Export** a song's tracks into one folder by clicking **Export…** in the
    song's toolbar and picking a destination. This copies all of that song's
    track files into a single new folder there (named after the song), using
@@ -56,7 +71,7 @@ swift run
    original `001_1`, `001_2`… folders.
 8. The sidebar has two tabs, **All Songs** and **Favorites**. Hover a song
    row to reveal a star on its left — click it to favorite the song (the
-   star turns solid white and stays visible even without hovering); the
+   star turns solid gold and stays visible even without hovering); the
    song then also appears under the Favorites tab. The song detail page has
    its own star next to the title for the same toggle, always visible.
 9. **Drag and drop** songs in the sidebar — grab anywhere on a row and drop
@@ -65,9 +80,11 @@ swift run
    Favorites doesn't disturb where those songs sit in All Songs, and vice
    versa.
 10. An **Export All** button sits below the list on the Favorites tab —
-    click it and pick a destination to export every favorite song's tracks
-    at once (each into its own folder there, same as the per-song Export),
-    then reveals them all in Finder.
+    click it, then type a name and choose a location for the folder that
+    will hold all your favorite songs' tracks (defaults to "Favorites",
+    but you can call it anything). Each favorite song gets its own
+    subfolder inside it, same as the per-song Export, and Finder opens to
+    reveal the result when done.
 
 Both favorites and the order are saved and survive relaunching or
    re-scanning the same folder.
